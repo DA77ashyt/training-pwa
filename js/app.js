@@ -4,7 +4,7 @@
 
 import DB from './db.js';
 import router from './router.js';
-import { SEED_PLAN, getPushDayTemplate, getPullDayTemplate } from './plan.js';
+import { SEED_PLAN, SEED_LOGS, getPushDayTemplate, getPullDayTemplate } from './plan.js';
 
 // ==================== Util ====================
 
@@ -79,6 +79,13 @@ async function initApp() {
     }
     // 加载历史日志
     allLogs = await DB.getLogs();
+    // 首次使用：导入历史训练记录种子数据
+    if (!allLogs.length) {
+      for (const log of SEED_LOGS) {
+        await DB.saveLog(log);
+      }
+      allLogs = await DB.getLogs();
+    }
   } catch (e) {
     console.error('Init error:', e);
   }

@@ -286,4 +286,122 @@ function getPullDayTemplate() {
   };
 }
 
-export { SEED_PLAN, getPushDayTemplate, getPullDayTemplate };
+/**
+ * SEED_LOGS — 历史训练记录种子数据
+ * 基于用户实际训练数据（7/15 推日 + 7/16 拉日）
+ */
+const SEED_LOGS = [
+  // ====== 7/15 推日（周三）======
+  {
+    id: 'hist-2026-07-15',
+    date: '2026-07-15',
+    sessionType: 'push',
+    planDayId: '2026-07-15',
+    startTime: '16:00',
+    endTime: '17:00',
+    duration: 60,
+    totalVolume: 3470,
+    calories: null,
+    rpe: 7,
+    feeling: '困倦',
+    bodyStatus: {
+      sleepQuality: 2,
+      sleepHours: 7,
+      jointPain: [],
+      painLevel: 1,
+      notes: '状态偏困倦，强度中等偏上，注意恢复'
+    },
+    cardio: null,
+    sets: [
+      // 杠铃平板卧推 60kg 5组金字塔 5/5/5/4/3
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 1, weight: 20, reps: 8, isCompleted: true, isWarmup: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 2, weight: 40, reps: 8, isCompleted: true, isWarmup: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 3, weight: 60, reps: 5, isCompleted: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 4, weight: 60, reps: 5, isCompleted: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 5, weight: 60, reps: 5, isCompleted: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 6, weight: 60, reps: 4, isCompleted: true },
+      { exerciseId: 'push1', exerciseName: '杠铃平板卧推', groupId: 'push1', setNumber: 7, weight: 60, reps: 3, isCompleted: true },
+      // 上斜史密斯卧推 25kg 4组 8/6/6/6
+      { exerciseId: 'push2', exerciseName: '上斜史密斯卧推', groupId: 'push2', setNumber: 1, weight: 25, reps: 8, isCompleted: true },
+      { exerciseId: 'push2', exerciseName: '上斜史密斯卧推', groupId: 'push2', setNumber: 2, weight: 25, reps: 6, isCompleted: true },
+      { exerciseId: 'push2', exerciseName: '上斜史密斯卧推', groupId: 'push2', setNumber: 3, weight: 25, reps: 6, isCompleted: true },
+      { exerciseId: 'push2', exerciseName: '上斜史密斯卧推', groupId: 'push2', setNumber: 4, weight: 25, reps: 6, isCompleted: true },
+      // 站姿轮换推举 30kg 5×5（超级组）
+      { exerciseId: 'push3a', exerciseName: '站姿轮换推举', groupId: 'push3a', setNumber: 1, weight: 30, reps: 5, isCompleted: true },
+      { exerciseId: 'push3a', exerciseName: '站姿轮换推举', groupId: 'push3a', setNumber: 2, weight: 30, reps: 5, isCompleted: true },
+      { exerciseId: 'push3a', exerciseName: '站姿轮换推举', groupId: 'push3a', setNumber: 3, weight: 30, reps: 5, isCompleted: true },
+      { exerciseId: 'push3a', exerciseName: '站姿轮换推举', groupId: 'push3a', setNumber: 4, weight: 30, reps: 5, isCompleted: true },
+      { exerciseId: 'push3a', exerciseName: '站姿轮换推举', groupId: 'push3a', setNumber: 5, weight: 30, reps: 5, isCompleted: true },
+      // 绳索双臂下压 18kg 5×6（超级组）
+      { exerciseId: 'push3b', exerciseName: '绳索双臂下压', groupId: 'push3b', setNumber: 1, weight: 18, reps: 6, isCompleted: true },
+      { exerciseId: 'push3b', exerciseName: '绳索双臂下压', groupId: 'push3b', setNumber: 2, weight: 18, reps: 6, isCompleted: true },
+      { exerciseId: 'push3b', exerciseName: '绳索双臂下压', groupId: 'push3b', setNumber: 3, weight: 18, reps: 6, isCompleted: true },
+      { exerciseId: 'push3b', exerciseName: '绳索双臂下压', groupId: 'push3b', setNumber: 4, weight: 18, reps: 6, isCompleted: true },
+      { exerciseId: 'push3b', exerciseName: '绳索双臂下压', groupId: 'push3b', setNumber: 5, weight: 18, reps: 6, isCompleted: true }
+    ]
+  },
+  // ====== 7/16 拉日（周四）======
+  {
+    id: 'hist-2026-07-16',
+    date: '2026-07-16',
+    sessionType: 'pull',
+    planDayId: '2026-07-16',
+    startTime: '15:00',
+    endTime: '15:53',
+    duration: 53,
+    totalVolume: 6180,
+    calories: 271,
+    rpe: 6,
+    feeling: '正常',
+    bodyStatus: {
+      sleepQuality: 3,
+      sleepHours: 8,
+      jointPain: [],
+      painLevel: 1,
+      notes: '训练目标：背阔肌、中下背部、斜方肌、肩后束、小臂肌群'
+    },
+    cardio: {
+      type: '固定单车',
+      duration: 30,
+      heartRate: 130
+    },
+    sets: [
+      // 宽距下拉 37.5kg，15kg热身
+      { exerciseId: 'pull1', exerciseName: '宽距下拉', groupId: 'pull1', setNumber: 1, weight: 15, reps: 12, isCompleted: true, isWarmup: true },
+      { exerciseId: 'pull1', exerciseName: '宽距下拉', groupId: 'pull1', setNumber: 2, weight: 37.5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull1', exerciseName: '宽距下拉', groupId: 'pull1', setNumber: 3, weight: 37.5, reps: 8, isCompleted: true },
+      { exerciseId: 'pull1', exerciseName: '宽距下拉', groupId: 'pull1', setNumber: 4, weight: 37.5, reps: 8, isCompleted: true },
+      { exerciseId: 'pull1', exerciseName: '宽距下拉', groupId: 'pull1', setNumber: 5, weight: 37.5, reps: 6, isCompleted: true },
+      // 窄距下拉 32.5kg 4组
+      { exerciseId: 'pull1b', exerciseName: '窄距下拉', groupId: 'pull1b', setNumber: 1, weight: 32.5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull1b', exerciseName: '窄距下拉', groupId: 'pull1b', setNumber: 2, weight: 32.5, reps: 8, isCompleted: true },
+      { exerciseId: 'pull1b', exerciseName: '窄距下拉', groupId: 'pull1b', setNumber: 3, weight: 32.5, reps: 8, isCompleted: true },
+      { exerciseId: 'pull1b', exerciseName: '窄距下拉', groupId: 'pull1b', setNumber: 4, weight: 32.5, reps: 6, isCompleted: true },
+      // 坐姿划船 30kg，25kg热身
+      { exerciseId: 'pull2', exerciseName: '坐姿划船', groupId: 'pull2', setNumber: 1, weight: 25, reps: 8, isCompleted: true, isWarmup: true },
+      { exerciseId: 'pull2', exerciseName: '坐姿划船', groupId: 'pull2', setNumber: 2, weight: 30, reps: 10, isCompleted: true },
+      { exerciseId: 'pull2', exerciseName: '坐姿划船', groupId: 'pull2', setNumber: 3, weight: 30, reps: 8, isCompleted: true },
+      { exerciseId: 'pull2', exerciseName: '坐姿划船', groupId: 'pull2', setNumber: 4, weight: 30, reps: 8, isCompleted: true },
+      { exerciseId: 'pull2', exerciseName: '坐姿划船', groupId: 'pull2', setNumber: 5, weight: 30, reps: 6, isCompleted: true },
+      // 潘德雷划船 50kg（本次最大负重）
+      { exerciseId: 'pull4', exerciseName: '潘德雷划船', groupId: 'pull4', setNumber: 1, weight: 50, reps: 8, isCompleted: true },
+      { exerciseId: 'pull4', exerciseName: '潘德雷划船', groupId: 'pull4', setNumber: 2, weight: 50, reps: 8, isCompleted: true },
+      { exerciseId: 'pull4', exerciseName: '潘德雷划船', groupId: 'pull4', setNumber: 3, weight: 50, reps: 6, isCompleted: true },
+      { exerciseId: 'pull4', exerciseName: '潘德雷划船', groupId: 'pull4', setNumber: 4, weight: 50, reps: 4, isCompleted: true },
+      // 单腿杠铃片旋转 5kg×10（超级组）
+      { exerciseId: 'pull5a', exerciseName: '单腿杠铃片旋转', groupId: 'pull5a', setNumber: 1, weight: 5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull5a', exerciseName: '单腿杠铃片旋转', groupId: 'pull5a', setNumber: 2, weight: 5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull5a', exerciseName: '单腿杠铃片旋转', groupId: 'pull5a', setNumber: 3, weight: 5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull5a', exerciseName: '单腿杠铃片旋转', groupId: 'pull5a', setNumber: 4, weight: 5, reps: 10, isCompleted: true },
+      { exerciseId: 'pull5a', exerciseName: '单腿杠铃片旋转', groupId: 'pull5a', setNumber: 5, weight: 5, reps: 10, isCompleted: true },
+      // 地雷杆甩 35kg×6（超级组）
+      { exerciseId: 'pull5b', exerciseName: '地雷杆甩', groupId: 'pull5b', setNumber: 1, weight: 35, reps: 6, isCompleted: true },
+      { exerciseId: 'pull5b', exerciseName: '地雷杆甩', groupId: 'pull5b', setNumber: 2, weight: 35, reps: 6, isCompleted: true },
+      { exerciseId: 'pull5b', exerciseName: '地雷杆甩', groupId: 'pull5b', setNumber: 3, weight: 35, reps: 6, isCompleted: true },
+      { exerciseId: 'pull5b', exerciseName: '地雷杆甩', groupId: 'pull5b', setNumber: 4, weight: 35, reps: 6, isCompleted: true },
+      { exerciseId: 'pull5b', exerciseName: '地雷杆甩', groupId: 'pull5b', setNumber: 5, weight: 35, reps: 6, isCompleted: true }
+    ]
+  }
+];
+
+export { SEED_PLAN, SEED_LOGS, getPushDayTemplate, getPullDayTemplate };
