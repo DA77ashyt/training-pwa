@@ -71,6 +71,12 @@ let restTimerInterval = null;
 let restTimerActive = false;
 let restDefaultSeconds = 60;
 
+// 格式化容量显示：12345 → "12,345kg"
+function fmtVolume(v) {
+  if (!v) return '-';
+  return v.toLocaleString('zh-CN') + 'kg';
+}
+
 // ==================== 初始化 ====================
 
 async function initApp() {
@@ -232,7 +238,7 @@ function renderVolumePreview() {
       <div class="volume-preview">
         <div class="volume-item">
           <div class="label">总容量</div>
-          <div class="value">${(totalVolume / 1000).toFixed(1)}k</div>
+          <div class="value">${fmtVolume(totalVolume)}</div>
         </div>
         <div class="volume-item">
           <div class="label">总时长</div>
@@ -833,7 +839,7 @@ function renderLogList() {
           <div class="log-item-type">${sessionNames[log.sessionType] || '训练'} · RPE ${log.rpe || '-'}</div>
           <div class="log-item-stats">
             <span>⏱ ${log.duration || '-'}min</span>
-            <span>🏋️ ${log.totalVolume ? (log.totalVolume / 1000).toFixed(1) + 'k' : '-'}kg</span>
+            <span>🏋️ ${fmtVolume(log.totalVolume)}</span>
             <span>${log.feeling ? '💬 ' + log.feeling : ''}</span>
           </div>
         </div>
@@ -866,7 +872,7 @@ window.showLogDetail = async function(logId) {
       <button class="btn btn-sm btn-outline" onclick="closeModal()">✕</button>
     </div>
     <div class="volume-preview" style="margin-bottom:var(--space-md)">
-      <div class="volume-item"><div class="label">总容量</div><div class="value">${log.totalVolume ? (log.totalVolume / 1000).toFixed(1) + 'k' : '-'}</div></div>
+      <div class="volume-item"><div class="label">总容量</div><div class="value">${fmtVolume(log.totalVolume)}</div></div>
       <div class="volume-item"><div class="label">时长</div><div class="value">${log.duration || '-'}<span style="font-size:12px">min</span></div></div>
       <div class="volume-item"><div class="label">RPE</div><div class="value">${log.rpe || '-'}</div></div>
     </div>
