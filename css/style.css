@@ -216,6 +216,35 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
   line-height: 1.5;
 }
 
+/* 今日计划预览 */
+.plan-preview {
+  display: flex;
+  flex-direction: column;
+}
+.plan-exercise {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.plan-exercise:last-child {
+  border-bottom: none;
+}
+.plan-exercise.superset {
+  border-left: 2px solid var(--color-info);
+  padding-left: var(--space-sm);
+  margin-left: calc(var(--space-sm) * -1);
+}
+.plan-exercise .plan-ex-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.plan-exercise .plan-ex-target {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
 /* 周进度条 */
 .week-progress {
   display: grid;
@@ -299,6 +328,12 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
   padding-bottom: var(--space-md);
   border-bottom: 1px solid rgba(255,255,255,0.06);
   margin-bottom: var(--space-md);
+  position: relative;
+}
+.train-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 .train-back {
   font-size: 24px;
@@ -314,6 +349,38 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
+}
+.rest-quick-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+.rest-quick-btn:active {
+  transform: scale(0.9);
+}
+.rest-config-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  margin-top: 4px;
+  animation: fadeIn 0.15s ease;
+}
+.rest-config-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 /* 训练阶段 */
@@ -787,8 +854,172 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 }
 
 /* =============================================
-   文件选择器（隐藏）
+   组间休息倒计时
    ============================================= */
-.file-input-hidden {
+.rest-timer-bar {
+  position: fixed;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(120%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--color-surface);
+  border-top: 2px solid var(--color-primary);
+  padding: var(--space-md);
+  z-index: 250;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+}
+.rest-timer-bar.active {
+  transform: translateX(-50%) translateY(0);
+}
+.rest-timer-inner {
+  text-align: center;
+}
+.rest-timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+.rest-timer-ex-name {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rest-timer-label {
+  font-size: 10px;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.rest-timer-countdown {
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1.1;
+  margin: var(--space-sm) 0;
+  text-shadow: 0 0 20px rgba(230,57,70,0.3);
+}
+.rest-timer-track {
+  width: 100%;
+  height: 4px;
+  background: var(--color-surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+.rest-timer-progress {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+  transition: width 1s linear;
+}
+.rest-timer-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+}
+.rest-timer-btn {
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-surface-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  transition: all 0.15s;
+}
+.rest-timer-btn:active {
+  transform: scale(0.95);
+}
+.rest-timer-skip {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+  font-weight: 600;
+}
+
+/* =============================================
+   训练内容 - 组状态增强
+   ============================================= */
+.set-row .set-done.checked + .set-input input {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.set-row.completed-row {
+  opacity: 0.6;
+}
+.set-row.completed-row .set-num {
+  color: var(--color-success);
+}
+
+/* 训练进度指示 */
+.exercise-card .progress-dots {
+  display: flex;
+  gap: 4px;
+  margin-top: var(--space-sm);
+  justify-content: center;
+}
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  transition: all 0.2s;
+}
+.progress-dot.done {
+  background: var(--color-success);
+}
+.progress-dot.active {
+  background: var(--color-primary);
+  box-shadow: 0 0 6px rgba(230,57,70,0.5);
+}
+
+/* =============================================
+   训练完成弹窗增强
+   ============================================= */
+.train-complete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 300;
   display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.train-complete-overlay.open {
+  display: flex;
+}
+.train-complete-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  max-width: 340px;
+  width: 90%;
+  text-align: center;
+}
+.train-complete-card .big-icon {
+  font-size: 56px;
+  margin-bottom: var(--space-md);
+}
+.train-complete-card .title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-xs);
+}
+.train-complete-card .stats {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.8;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

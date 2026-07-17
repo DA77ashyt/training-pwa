@@ -64,6 +64,12 @@ let currentTrainingLog = null;
 let currentTrainingDayId = null;
 let timerInterval = null;
 let trainingStartTime = null;
+// 组间休息倒计时状态
+let restTimerRemaining = 0;
+let restTimerTotal = 0;
+let restTimerInterval = null;
+let restTimerActive = false;
+let restDefaultSeconds = 60;
 
 // ==================== 初始化 ====================
 
@@ -147,12 +153,31 @@ function renderToday() {
   // 容量速览（从已有日志算）
   html += renderVolumePreview();
 
-  // 开始训练按钮
+  // 开始训练按钮 + 训练计划预览
   if (daySchedule.sessionType !== 'rest' && daySchedule.exercises?.length > 0) {
     if (todayLog) {
       html += `<button class="btn btn-secondary" onclick="router.navigate('/history?log=${todayLog.id}')">✅ 今天已记录 · 查看详情</button>`;
     } else {
-      html += `<button class="btn btn-primary" onclick="startTraining('${daySchedule.date}')">🔥 开始训练</button>`;
+      // 计划预览
+      html += '<div class="card" style="margin-bottom:var(--space-md)"><div class="card-header">📋 今日训练计划</div>';
+      html += '<div class="plan-preview">';
+      daySchedule.exercises.forEach(ex => {
+        html += `
+          <div class="plan-exercise ${ex.isSuperset ? 'superset' : ''}">
+            <div class="plan-ex-name">${ex.name} ${ex.isSuperset ? '<span class="badge badge-blue" style="font-size:10px;margin-left:4px">超级组</span>' : ''}</div>
+            <div class="plan-ex-target">${ex.target}${ex.restBetweenSets ? ' · 组间休息 ' + ex.restBetweenSets : ''}</div>
+          </div>
+        `;
+      });
+      if (daySchedule.warmup?.length) {
+        html += `<div class="plan-exercise" style="opacity:0.6"><div class="plan-ex-name">🔥 热身 ${daySchedule.warmup.length} 项</div></div>`;
+      }
+      if (daySchedule.cardio) {
+        html += `<div class="plan-exercise" style="border-bottom:none"><div class="plan-ex-name">❤️ 有氧：${daySchedule.cardio.type} ${daySchedule.cardio.duration}</div></div>`;
+      }
+      html += '</div></div>';
+
+      html += `<button class="btn btn-primary" onclick="startTraining('${daySchedule.date}')" style="font-size:var(--font-size-lg);padding:16px;margin-top:var(--space-sm)">🔥 开始训练</button>`;
     }
   }
 
@@ -230,6 +255,7 @@ function renderVolumePreview() {
 function startTraining(date) {
   router.navigate(`/train?date=${date}`);
 }
+window.startTraining = startTraining;
 
 function renderTraining(params) {
   const date = params.date || todayStr();
@@ -282,7 +308,19 @@ function renderTraining(params) {
     <div class="train-header">
       <button class="train-back" onclick="router.navigate('/')">‹</button>
       <div class="train-title">${daySchedule.title}</div>
-      <div class="train-timer" id="train-timer">00:00</div>
+      <div class="train-header-right">
+        <div class="train-timer" id="train-timer">00:00</div>
+        <button class="rest-quick-btn" onclick="toggleRestConfig()" title="设置休息时间">⏱</button>
+      </div>
+    </div>
+    <div id="rest-config-popup" class="rest-config-popup" style="display:none">
+      <div class="rest-config-row">
+        <span style="font-size:var(--font-size-sm)">组间休息</span>
+        <button class="btn btn-sm btn-outline" onclick="adjustTrainingRest(-15)" style="width:32px;padding:2px">−</button>
+        <span id="training-rest-display" style="font-family:var(--font-mono);font-weight:700;min-width:28px;text-align:center">${restDefaultSeconds}</span>
+        <button class="btn btn-sm btn-outline" onclick="adjustTrainingRest(15)" style="width:32px;padding:2px">+</button>
+        <span style="font-size:var(--font-size-xs);color:var(--color-text-muted)">秒</span>
+      </div>
     </div>
   `;
 
@@ -457,6 +495,14 @@ window.toggleSet = function(exIdx, setIdx) {
   if (!check) return;
   check.classList.toggle('checked');
   updateExerciseStatus(exIdx);
+
+  // 如果勾选了（完成一组），启动休息倒计时
+  if (check.classList.contains('checked')) {
+    checkAndStartRest(exIdx);
+  } else {
+    // 取消勾选时停止休息（降低严格度，让用户取消时同时停掉休息）
+    stopRestTimer();
+  }
 };
 
 function updateExerciseStatus(exIdx) {
@@ -568,6 +614,131 @@ function stopTimer() {
   if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
+  }
+}
+
+// ==================== 组间休息倒计时 ====================
+
+function parseRestSeconds(str) {
+  if (!str) return restDefaultSeconds;
+  const s = String(str).trim().toLowerCase();
+  // 格式 "90s" → 90
+  if (s.endsWith('s')) return parseInt(s) || restDefaultSeconds;
+  // 格式 "1:30" → 90
+  if (s.includes(':')) {
+    const parts = s.split(':');
+    return parseInt(parts[0]) * 60 + (parseInt(parts[1]) || 0);
+  }
+  // 纯数字
+  const n = parseInt(s);
+  return n > 0 ? n : restDefaultSeconds;
+}
+
+function startRestTimer(seconds) {
+  stopRestTimer();
+  restTimerActive = true;
+  restTimerTotal = seconds;
+  restTimerRemaining = seconds;
+  renderRestTimer();
+
+  restTimerInterval = setInterval(() => {
+    restTimerRemaining--;
+    renderRestTimer();
+    if (restTimerRemaining <= 0) {
+      stopRestTimer();
+      // 震动 + toast 提示
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      showToast('⏰ 休息结束！继续下一组', 'success');
+    }
+  }, 1000);
+}
+
+function stopRestTimer() {
+  if (restTimerInterval) {
+    clearInterval(restTimerInterval);
+    restTimerInterval = null;
+  }
+  restTimerActive = false;
+  restTimerRemaining = 0;
+  const el = $('#rest-timer-bar');
+  if (el) el.classList.remove('active');
+}
+
+function skipRestTimer() {
+  stopRestTimer();
+}
+window.skipRestTimer = skipRestTimer;
+
+function addRestTime(seconds) {
+  if (!restTimerActive) return;
+  restTimerRemaining += seconds;
+  restTimerTotal += seconds;
+  renderRestTimer();
+}
+window.addRestTime = addRestTime;
+
+window.toggleRestConfig = function() {
+  const popup = $('#rest-config-popup');
+  if (!popup) return;
+  const show = popup.style.display !== 'flex';
+  popup.style.display = show ? 'flex' : 'none';
+};
+
+window.adjustTrainingRest = function(delta) {
+  restDefaultSeconds = Math.max(15, Math.min(300, restDefaultSeconds + delta));
+  const display = $('#training-rest-display');
+  if (display) display.textContent = restDefaultSeconds;
+};
+
+function renderRestTimer() {
+  let el = $('#rest-timer-bar');
+  if (!el) return;
+  if (!restTimerActive) {
+    el.classList.remove('active');
+    return;
+  }
+  el.classList.add('active');
+  const mins = String(Math.floor(restTimerRemaining / 60)).padStart(2, '0');
+  const secs = String(restTimerRemaining % 60).padStart(2, '0');
+  const pct = restTimerTotal > 0 ? (restTimerRemaining / restTimerTotal) * 100 : 0;
+
+  $('#rest-timer-countdown').textContent = `${mins}:${secs}`;
+  $('#rest-timer-progress').style.width = `${pct}%`;
+  $('#rest-timer-exercise-name').textContent = restTimerActive ? getLastCompletedExerciseName() : '';
+}
+
+function getLastCompletedExerciseName() {
+  const cards = document.querySelectorAll('.exercise-card[data-section="main"]');
+  // 找最近完成组的动作名
+  for (let i = cards.length - 1; i >= 0; i--) {
+    const nameEl = cards[i].querySelector('.exercise-name');
+    if (nameEl) return nameEl.textContent.replace('超级组', '').trim();
+  }
+  return '';
+}
+
+/**
+ * 检查当前动作还有未完成的组 → 启动休息倒计时
+ */
+function checkAndStartRest(exIdx) {
+  const cards = document.querySelectorAll('.exercise-card[data-section="main"]');
+  const card = cards[exIdx];
+  if (!card) return;
+
+  const checks = card.querySelectorAll('.set-done');
+  const done = [...checks].filter(c => c.classList.contains('checked')).length;
+  const total = checks.length;
+
+  // 如果不是所有组都完成了 → 启动休息
+  if (done > 0 && done < total) {
+    // 从计划数据中获取该动作的 restBetweenSets
+    const schedule = currentPlan?.schedule || [];
+    const daySchedule = schedule.find(s => s.date === currentTrainingDayId);
+    const exercises = daySchedule?.exercises || [];
+    const exercise = exercises[exIdx];
+    const restSec = exercise ? parseRestSeconds(exercise.restBetweenSets) : restDefaultSeconds;
+    restTimerActive = true;
+    startRestTimer(restSec);
   }
 }
 
@@ -760,6 +931,24 @@ function renderSettings() {
     <div style="font-size:var(--font-size-xl);font-weight:800;margin-bottom:var(--space-lg)">⚙️ 设置</div>
 
     <div class="settings-section">
+      <div class="settings-section-title">训练偏好</div>
+      <div class="card">
+        <div class="settings-row">
+          <div>
+            <div class="settings-label">⏱️ 组间休息默认时长</div>
+            <div class="settings-desc">每组完成后自动倒计时（秒）</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-sm btn-outline" onclick="adjustRestDefault(-15)" style="width:36px;padding:4px">−</button>
+            <span id="rest-default-display" style="font-family:var(--font-mono);min-width:32px;text-align:center;font-weight:700">${restDefaultSeconds}</span>
+            <button class="btn btn-sm btn-outline" onclick="adjustRestDefault(15)" style="width:36px;padding:4px">+</button>
+            <span style="font-size:var(--font-size-xs);color:var(--color-text-muted)">秒</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
       <div class="settings-section-title">数据管理</div>
       <div class="card">
         <div class="settings-row">
@@ -868,6 +1057,13 @@ window.exportLogs = async function() {
   } catch (e) {
     showToast('❌ 导出失败：' + e.message, 'error');
   }
+};
+
+window.adjustRestDefault = function(delta) {
+  restDefaultSeconds = Math.max(15, Math.min(300, restDefaultSeconds + delta));
+  const display = $('#rest-default-display');
+  if (display) display.textContent = restDefaultSeconds;
+  showToast(`组间休息设为 ${restDefaultSeconds} 秒`, 'success');
 };
 
 window.clearAllData = async function() {

@@ -66,6 +66,24 @@
     <div id="loading-overlay" class="modal-overlay" style="display:none;align-items:center">
       <div class="loading"><div class="spinner"></div></div>
     </div>
+
+    <!-- 组间休息倒计时 -->
+    <div id="rest-timer-bar" class="rest-timer-bar">
+      <div class="rest-timer-inner">
+        <div class="rest-timer-header">
+          <span id="rest-timer-exercise-name" class="rest-timer-ex-name"></span>
+          <span class="rest-timer-label">组间休息</span>
+        </div>
+        <div class="rest-timer-countdown" id="rest-timer-countdown">01:00</div>
+        <div class="rest-timer-track">
+          <div class="rest-timer-progress" id="rest-timer-progress" style="width:100%"></div>
+        </div>
+        <div class="rest-timer-actions">
+          <button class="rest-timer-btn" id="rest-timer-add30" onclick="addRestTime(30)">+30s</button>
+          <button class="rest-timer-btn rest-timer-skip" onclick="skipRestTimer()">跳过 ›</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="js/app.js"></script>
