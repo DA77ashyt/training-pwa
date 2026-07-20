@@ -85,7 +85,7 @@
 | 地址 | 说明 |
 |------|------|
 | `https://da77ashyt.github.io/training-pwa/` | GitHub Pages（海外，需 VPN） |
-| `https://training-pwa.你的域名.com` | Cloudflare Pages（国内直连，设置后生效） |
+| `https://training-pwa.pages.dev` | Cloudflare Pages（国内直连 ✅，自动部署） |
 
 ### 安装到桌面（推荐）
 
