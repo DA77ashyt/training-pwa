@@ -82,11 +82,10 @@
 
 ### 在线访问
 
-打开浏览器访问：
-
-```
-https://da77ashyt.github.io/training-pwa/
-```
+| 地址 | 说明 |
+|------|------|
+| `https://da77ashyt.github.io/training-pwa/` | GitHub Pages（海外，需 VPN） |
+| `https://training-pwa.你的域名.com` | Cloudflare Pages（国内直连，设置后生效） |
 
 ### 安装到桌面（推荐）
 
@@ -217,7 +216,8 @@ https://da77ashyt.github.io/training-pwa/
 | 存储 | **IndexedDB** | 结构化数据，支持索引查询 |
 | 路由 | **Hash-based SPA Router** | 轻量，兼容多浏览器 |
 | PWA | **Service Worker + Manifest** | 离线缓存 + 可安装到桌面 |
-| 部署 | **GitHub Pages** | 免费 HTTPS，自动 CDN |
+| 部署 | **GitHub Pages + Cloudflare Pages** | 免费 HTTPS，国内直连，自动 CDN |
+| CI/CD | **GitHub Actions** | push 自动部署到 Cloudflare Pages |
 
 ---
 
