@@ -3,8 +3,9 @@
 > **大体重橄榄球运动员 · 推拉循环 · 康复训练期**  
 > 离线可用的训练追踪工具，配合 [WorkBuddy](https://www.codebuddy.cn) AI 教练实现计划同步与数据分析。
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-在线-blue?style=flat-square)](https://da77ashyt.github.io/training-pwa/)
-[![PWA](https://img.shields.io/badge/PWA-离线可用-5a0fc8?style=flat-square)](https://da77ashyt.github.io/training-pwa/)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-国内直连-orange?style=flat-square)](https://training-pwa.pages.dev)
+[![PWA](https://img.shields.io/badge/PWA-离线可用-5a0fc8?style=flat-square)](https://training-pwa.pages.dev)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-备用-f0f0f0?style=flat-square)](https://da77ashyt.github.io/training-pwa/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#license)
 
 ---
@@ -84,8 +85,8 @@
 
 | 地址 | 说明 |
 |------|------|
-| `https://da77ashyt.github.io/training-pwa/` | GitHub Pages（海外，需 VPN） |
-| `https://training-pwa.pages.dev` | Cloudflare Pages（国内直连 ✅，自动部署） |
+| `https://training-pwa.pages.dev` | **Cloudflare Pages（推荐 ✅ 国内直连 · 自动部署）** |
+| `https://da77ashyt.github.io/training-pwa/` | GitHub Pages（海外备用，需 VPN） |
 
 ### 安装到桌面（推荐）
 
